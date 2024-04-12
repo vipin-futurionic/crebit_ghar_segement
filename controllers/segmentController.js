@@ -58,7 +58,7 @@ async function executeQuery(req, res) {
         const batch = leadData.slice(i, i + batchSize);
 
         const promises = batch.map(async (lead) => {
-          const leadId = lead.id; // Assuming 'id' is the primary key of leadTable
+          const leadId = lead.id; 
           // Check if the combination of leadId and segmentId already exists in SegmentData table
           const existingData = await SegmentData.findOne({
             where: {
