@@ -1,6 +1,8 @@
 const db = require("../config/database");
+const sequelize = require("sequelize");
 const Segment = require("../model/Segment");
 const SegmentData = require("../model/SegmentData");
+const Lead = require("../model/Lead");
 
 async function executeQuery(req, res) {
   try {
@@ -32,8 +34,19 @@ async function executeQuery(req, res) {
       });
     }
 
-    // Step 2: Run the query to get data from the leadTable
-    const leadData = await db.query(query, { type: db.QueryTypes.SELECT });
+    // Extracting the condition from the query
+    const conditionRegex = /WHERE\s+(.*)/i;
+    const conditionMatch = query.match(conditionRegex);
+    let condition = {};
+    if (conditionMatch) {
+      condition = sequelize.literal(conditionMatch[1]);
+    }
+
+    // Step 2: Fetch data from the Lead table based on the dynamic condition
+    const leadData = await Lead.findAll({
+      where: condition,
+      raw: true,
+    });
 
     // Step 3: Process fetched data and store leadId and segmentId for each row
     if (leadData && leadData.length > 0) {
@@ -55,7 +68,9 @@ async function executeQuery(req, res) {
           });
           if (existingData) {
             // If data already exists, update the refreshCounter
-            await existingData.increment("refreshCounter");
+            await existingData.update({
+              refreshCounter: segment.refreshCounter,
+            });
           } else {
             // If data doesn't exist, create a new entry
             await SegmentData.create({
