@@ -9,4 +9,5 @@ const db = new Sequelize('TestDB', 'postgres', '9999', {
 
 );
 
+
 module.exports = db;

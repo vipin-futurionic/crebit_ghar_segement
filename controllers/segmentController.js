@@ -43,9 +43,15 @@ async function executeQuery(req, res) {
     }
 
     // Step 2: Fetch data from the Lead table based on the dynamic condition
-    const leadData = await Lead.findAll({
-      where: condition,
-      raw: true,
+    // const leadData = await Lead.findAll({
+    //   where: condition,
+    //   raw: true,
+    // });
+
+    console.log(await db.query(query, { raw: true }));
+
+    const leadData = await db.query(query, {
+      type: db.QueryTypes.SELECT,
     });
 
     // Step 3: Process fetched data and store leadId and segmentId for each row
@@ -58,7 +64,7 @@ async function executeQuery(req, res) {
         const batch = leadData.slice(i, i + batchSize);
 
         const promises = batch.map(async (lead) => {
-          const leadId = lead.id; 
+          const leadId = lead.id;
           // Check if the combination of leadId and segmentId already exists in SegmentData table
           const existingData = await SegmentData.findOne({
             where: {
