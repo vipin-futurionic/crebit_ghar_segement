@@ -3,10 +3,10 @@ const bodyParser = require("body-parser");
 const db = require("./config/database");
 const leadRoutes = require("./routes/leadRoutes");
 const segmentRoutes = require("./routes/segmentRoutes");
-
 const app = express();
 const PORT = 3000;
 
+// Database
 db.authenticate()
   .then(() => {
     console.log("Connection to database has been established successfully.");
