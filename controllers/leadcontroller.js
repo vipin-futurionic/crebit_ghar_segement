@@ -1,74 +1,69 @@
-const Lead = require("../model/Lead");
-createLead = async (req, res) => {
+const leadService = require("../services/leadServices");
+
+const createLead = async (req, res) => {
   try {
     const { customerId, customerName, phoneNo } = req.body;
     if (!customerId || !customerName || !phoneNo) {
       return res.status(400).json({ error: "Missing required fields" });
     }
-    const lead = await Lead.create({ customerId, customerName, phoneNo });
-    
+    const lead = await leadService.createLead({
+      customerId,
+      customerName,
+      phoneNo,
+    });
     return res.json(lead);
   } catch (error) {
-    res.status(500).json({ error: "Server error" });
+    res.status(500).json({ error: error.message });
   }
 };
 
-getAllLeads = async (req, res) => {
+const getAllLeads = async (req, res) => {
   try {
-    const leads = await Lead.findAll();
-    res.json(leads);
+    const leads = await leadService.getAllLeads();
+    return res.json(leads);
   } catch (error) {
-    res.status(500).json({ error: "Server error" });
+    res.status(500).json({ error: error.message });
   }
 };
 
-getLeadById = async (req, res) => {
+const getLeadById = async (req, res) => {
   try {
     const { id } = req.params;
-    const lead = await Lead.findByPk(id);
-    if (!lead) {
-      return res.status(404).json({ error: "Lead not found" });
-    }
-    res.json(lead);
+    const lead = await leadService.getLeadById(id);
+    return res.json(lead);
   } catch (error) {
-    res.status(500).json({ error: "Server error" });
+    res.status(500).json({ error: error.message });
   }
 };
 
-updateLead = async (req, res) => {
+const updateLead = async (req, res) => {
   try {
     const { id } = req.params;
     const { customerId, customerName, phoneNo } = req.body;
-
-    const lead = await Lead.findByPk(id);
-    if (!lead) {
-      return res.status(404).json({ error: "Lead not found" });
-    }
-
-    await lead.update({ customerId, customerName, phoneNo });
-    res.json(lead);
+    const lead = await leadService.updateLead(id, {
+      customerId,
+      customerName,
+      phoneNo,
+    });
+    return res.json(lead);
   } catch (error) {
-    res.status(500).json({ error: "Server error" });
+    res.status(500).json({ error: error.message });
   }
 };
 
-deleteLead = async (req, res) => {
+const deleteLead = async (req, res) => {
   try {
     const { id } = req.params;
-    const lead = await Lead.findByPk(id);
-    if (!lead) {
-      return res.status(404).json({ error: "Lead not found" });
-    }
-    await lead.destroy();
-    res.json({ message: "Lead deleted successfully" });
+    const result = await leadService.deleteLead(id);
+    return res.json(result);
   } catch (error) {
-    res.status(500).json({ error: "Server error" });
+    res.status(500).json({ error: error.message });
   }
 };
 
 module.exports = {
-  getAllLeads,
   createLead,
+  getAllLeads,
   getLeadById,
   updateLead,
   deleteLead,
