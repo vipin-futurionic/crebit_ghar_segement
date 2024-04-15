@@ -48,7 +48,7 @@ async function executeQuery(req, res) {
     //   raw: true,
     // });
 
-    console.log(await db.query(query, { raw: true }));
+    // console.log(await db.query(query, { raw: true }));
 
     const leadData = await db.query(query, {
       type: db.QueryTypes.SELECT,
